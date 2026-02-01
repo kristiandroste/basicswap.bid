@@ -10,19 +10,22 @@ const pageSize = 20;
 let sortColumn = 'expiresAt';
 let sortDirection = 'asc';
 
+let isUsingFallbackData = false;
+
 // Fetch data from API
 async function fetchStatus() {
   try {
-    // For demo/development, use mock data if API not available
     const response = await fetch(`${API_BASE}/sync/status`);
     if (!response.ok) throw new Error('API not available');
+    isUsingFallbackData = false;
     return await response.json();
   } catch (e) {
-    console.warn('Using mock status data');
+    console.warn('API not available');
+    isUsingFallbackData = true;
     return {
-      status: 'fresh',
-      lastSyncAt: new Date().toISOString(),
-      ageSeconds: 5,
+      status: 'unavailable',
+      lastSyncAt: null,
+      ageSeconds: null,
       offerCount: 0
     };
   }
@@ -36,8 +39,8 @@ async function fetchOrderbook() {
     if (!response.ok) throw new Error('API not available');
     return await response.json();
   } catch (e) {
-    console.warn('Using mock orderbook data');
-    return { data: getMockOffers(), meta: { lastSyncAt: new Date().toISOString(), offerCount: 5 } };
+    console.warn('Orderbook API not available');
+    return { data: [], meta: { lastSyncAt: null, offerCount: 0 } };
   }
 }
 
@@ -49,8 +52,8 @@ async function fetchPairs() {
     if (!response.ok) throw new Error('API not available');
     return await response.json();
   } catch (e) {
-    console.warn('Using mock pairs data');
-    return { data: getMockPairs() };
+    console.warn('Pairs API not available');
+    return { data: [] };
   }
 }
 
@@ -84,7 +87,9 @@ function updateFreshness(status) {
 
   dot.className = 'freshness-dot ' + status.status;
 
-  if (status.status === 'fresh') {
+  if (status.status === 'unavailable') {
+    text.textContent = 'No live data available';
+  } else if (status.status === 'fresh') {
     text.textContent = 'Live data';
   } else if (status.status === 'recent') {
     text.textContent = 'Data is ' + formatAge(status.ageSeconds) + ' old';

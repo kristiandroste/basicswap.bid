@@ -159,6 +159,7 @@ body {
 .freshness-dot.fresh { background: var(--accent-green); }
 .freshness-dot.recent { background: var(--accent-yellow); }
 .freshness-dot.stale { background: var(--accent-red); }
+.freshness-dot.unavailable { background: var(--text-dim); animation: none; }
 
 @keyframes pulse {
   0%, 100% { opacity: 1; }
