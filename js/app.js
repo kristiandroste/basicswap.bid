@@ -31,10 +31,13 @@ async function fetchStatus() {
   }
 }
 
+// Demo API key for public website access
+const DEMO_API_KEY = 'bsw_live_demo_dde028ff64aafb1bc73541deda68798f';
+
 async function fetchOrderbook() {
   try {
     const response = await fetch(`${API_BASE}/v1/orderbook`, {
-      headers: { 'X-API-Key': 'demo' }
+      headers: { 'X-API-Key': DEMO_API_KEY }
     });
     if (!response.ok) throw new Error('API not available');
     return await response.json();
@@ -47,7 +50,7 @@ async function fetchOrderbook() {
 async function fetchPairs() {
   try {
     const response = await fetch(`${API_BASE}/v1/pairs`, {
-      headers: { 'X-API-Key': 'demo' }
+      headers: { 'X-API-Key': DEMO_API_KEY }
     });
     if (!response.ok) throw new Error('API not available');
     return await response.json();
@@ -165,6 +168,14 @@ function applyFilters() {
     return true;
   });
 
+  // Track filter applied
+  if (typeof mixpanel !== 'undefined' && (fromFilter || toFilter)) {
+    mixpanel.track('Orderbook Filtered', {
+      coin_from: fromFilter || 'all',
+      coin_to: toFilter || 'all'
+    });
+  }
+
   currentPage = 1;
   sortOffers();
   renderTable();
@@ -185,6 +196,15 @@ function sortTable(column) {
     sortColumn = column;
     sortDirection = 'asc';
   }
+
+  // Track sort
+  if (typeof mixpanel !== 'undefined') {
+    mixpanel.track('Orderbook Sorted', {
+      column: column,
+      direction: sortDirection
+    });
+  }
+
   sortOffers();
   renderTable();
 }
@@ -325,8 +345,26 @@ async function loadData() {
   }
 }
 
+// Manual refresh with tracking
+function manualRefresh() {
+  if (typeof mixpanel !== 'undefined') {
+    mixpanel.track('Refresh Clicked');
+  }
+  loadData();
+}
+
 // Initialize
 loadData();
 
 // Auto-refresh
 setInterval(loadData, REFRESH_INTERVAL);
+
+// Track CTA link clicks
+if (typeof mixpanel !== 'undefined') {
+  mixpanel.track_links('.btn-primary', 'CTA Clicked', function(el) {
+    return { cta_type: 'get_api_access', href: el.href };
+  });
+  mixpanel.track_links('.btn-secondary', 'CTA Clicked', function(el) {
+    return { cta_type: 'view_docs', href: el.href };
+  });
+}
