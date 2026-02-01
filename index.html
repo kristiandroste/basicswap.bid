@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>BasicSwap Orderbook - Live DEX Data</title>
+  <meta name="description" content="Live orderbook data from the BasicSwap decentralized exchange. View offers, trading pairs, and market statistics.">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <header class="header">
+    <div class="header-content">
+      <a href="/" class="logo">
+        <span class="logo-text">BasicSwap</span>
+        <span class="logo-badge">Orderbook</span>
+      </a>
+      <nav class="nav">
+        <a href="https://docs.basicswap.bid" class="nav-link">API Docs</a>
+        <a href="https://account.basicswap.bid" class="nav-link btn-primary">Get API Access</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="container">
+    <!-- Data Freshness Indicator -->
+    <div class="freshness-bar">
+      <div class="freshness-indicator" id="freshness-indicator">
+        <span class="freshness-dot"></span>
+        <span class="freshness-text" id="freshness-text">Connecting...</span>
+      </div>
+      <div class="freshness-stats">
+        <span id="offer-count">0</span> offers
+        <span class="separator">|</span>
+        <span id="last-updated">--</span>
+      </div>
+      <button class="btn-refresh" onclick="loadData()" title="Refresh">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M23 4v6h-6M1 20v-6h6M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/>
+        </svg>
+      </button>
+    </div>
+
+    <!-- Filters -->
+    <div class="filters-bar">
+      <div class="filter-group">
+        <label>From</label>
+        <select id="filter-from" onchange="applyFilters()">
+          <option value="">All Coins</option>
+        </select>
+      </div>
+      <div class="filter-group">
+        <label>To</label>
+        <select id="filter-to" onchange="applyFilters()">
+          <option value="">All Coins</option>
+        </select>
+      </div>
+      <button class="btn-clear" onclick="clearFilters()">Clear Filters</button>
+    </div>
+
+    <!-- Offers Table -->
+    <div class="table-container">
+      <table class="offers-table">
+        <thead>
+          <tr>
+            <th class="sortable" onclick="sortTable('pair')">
+              Pair <span class="sort-icon">↕</span>
+            </th>
+            <th class="sortable" onclick="sortTable('amountFrom')">
+              Amount <span class="sort-icon">↕</span>
+            </th>
+            <th class="sortable" onclick="sortTable('rate')">
+              Rate <span class="sort-icon">↕</span>
+            </th>
+            <th class="sortable" onclick="sortTable('minSwap')">
+              Min Swap <span class="sort-icon">↕</span>
+            </th>
+            <th class="sortable" onclick="sortTable('expiresAt')">
+              Expires <span class="sort-icon">↕</span>
+            </th>
+          </tr>
+        </thead>
+        <tbody id="offers-body">
+          <tr class="loading-row">
+            <td colspan="5">
+              <div class="loading-spinner"></div>
+              <span>Loading orderbook...</span>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Pagination -->
+    <div class="pagination" id="pagination" style="display:none">
+      <button class="btn-page" id="prev-btn" onclick="prevPage()" disabled>Previous</button>
+      <span class="page-info" id="page-info">Page 1 of 1</span>
+      <button class="btn-page" id="next-btn" onclick="nextPage()">Next</button>
+    </div>
+
+    <!-- Pair Stats -->
+    <div class="stats-section">
+      <h2>Trading Pairs</h2>
+      <div class="pairs-grid" id="pairs-grid">
+        <div class="loading-text">Loading pairs...</div>
+      </div>
+    </div>
+
+    <!-- API CTA -->
+    <div class="api-cta">
+      <h2>Need Orderbook Data?</h2>
+      <p>Access this data programmatically via our REST API. Free tier includes 5 requests/minute.</p>
+      <div class="cta-buttons">
+        <a href="https://docs.basicswap.bid" class="btn-secondary">View API Docs</a>
+        <a href="https://account.basicswap.bid" class="btn-primary">Get API Key</a>
+      </div>
+    </div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-content">
+      <p>Data sourced from <a href="https://basicswapdex.com" target="_blank">BasicSwap DEX</a></p>
+      <p class="footer-links">
+        <a href="https://github.com/basicswap/basicswap">GitHub</a>
+        <span class="separator">|</span>
+        <a href="https://docs.basicswap.bid">API</a>
+      </p>
+    </div>
+  </footer>
+
+  <script src="js/app.js"></script>
+</body>
+</html>
